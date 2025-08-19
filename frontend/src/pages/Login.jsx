@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const Login = () => {
         password: '',
     });
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const { username, password } = formData;
 
@@ -34,7 +36,7 @@ const Login = () => {
             axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
             setMessage('¡Inicio de sesión exitoso!');
-            // En un futuro, aquí redirigirías al usuario a otra página.
+            navigate('/');
 
         } catch (err) {
             console.error('Error en el login:', err.response ? err.response.data : err);
