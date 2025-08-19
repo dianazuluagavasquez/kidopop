@@ -11,6 +11,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('users.urls')),
     path('api/products/', include('products.urls')),
+    path('api/chat/', include('chat.urls')),
 ]
 
 # Este bloque de código necesita la variable 'settings' para saber si está

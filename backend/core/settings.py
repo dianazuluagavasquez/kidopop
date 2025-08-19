@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # Mis Apps
     'users',                            # <-- Tu app de usuarios
     'products',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -176,3 +177,9 @@ MEDIA_URL = '/media/'
 
 # Directorio donde Django guardará los archivos subidos
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

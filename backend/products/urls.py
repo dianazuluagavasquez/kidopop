@@ -1,7 +1,7 @@
 # backend/products/urls.py
 
 from django.urls import path
-from .views import ProductListCreateView, ProductDetailView
+from .views import ProductListCreateView, ProductDetailView , CategoryListView
 
 urlpatterns = [
     # Esta ruta corresponde a /api/products/ (para listar y crear)
@@ -9,4 +9,6 @@ urlpatterns = [
 
     # Esta ruta corresponde a /api/products/<id>/ (para ver, editar y borrar un producto)
     path('<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
+
+    path('categories/', CategoryListView.as_view(), name='category-list'),
 ]
