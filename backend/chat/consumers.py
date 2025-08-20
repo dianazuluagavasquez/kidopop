@@ -1,113 +1,78 @@
-# # backend/chat/consumers.py
-
-# import json
-# from channels.generic.websocket import AsyncWebsocketConsumer
-
-# class ChatConsumer(AsyncWebsocketConsumer):
-#     # Este método se llama cuando un usuario intenta conectarse.
-#     async def connect(self):
-#         # Obtenemos el ID de la sala de chat desde la URL.
-#         self.room_name = self.scope['url_route']['kwargs']['room_name']
-#         self.room_group_name = f'chat_{self.room_name}'
-
-#         # Unirse a la sala de chat (grupo de Channels).
-#         await self.channel_layer.group_add(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#         # Aceptar la conexión WebSocket.
-#         await self.accept()
-
-#     # Este método se llama cuando la conexión se cierra.
-#     async def disconnect(self, close_code):
-#         # Salir de la sala de chat.
-#         await self.channel_layer.group_discard(
-#             self.room_group_name,
-#             self.channel_name
-#         )
-
-#     # Este método se llama cuando se recibe un mensaje desde el WebSocket (frontend).
-#     async def receive(self, text_data):
-#         text_data_json = json.loads(text_data)
-#         message = text_data_json['message']
-#         sender = text_data_json['sender']
-
-#         # Enviar el mensaje a todos en la sala de chat.
-#         await self.channel_layer.group_send(
-#             self.room_group_name,
-#             {
-#                 'type': 'chat_message', # Llama al método chat_message
-#                 'message': message,
-#                 'sender': sender
-#             }
-#         )
-
-#     # Recibe el mensaje desde el grupo y lo envía de vuelta al WebSocket (frontend).
-#     async def chat_message(self, event):
-#         message = event['message']
-#         sender = event['sender']
-
-#         # Enviar el mensaje al WebSocket.
-#         await self.send(text_data=json.dumps({
-#             'message': message,
-#             'sender': sender
-#         }))
-
 # backend/chat/consumers.py
 
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from .models import Message, Conversation
+from django.contrib.auth.models import User
+from .serializers import MessageSerializer
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        try:
-            # Obtenemos el ID de la sala de chat desde la URL.
+        # AuthMiddlewareStack nos da el usuario en self.scope['user']
+        # Verificamos si el usuario está autenticado.
+        if self.scope['user'].is_authenticated:
             self.room_name = self.scope['url_route']['kwargs']['room_name']
             self.room_group_name = f'chat_{self.room_name}'
 
-            # Unirse a la sala de chat (grupo de Channels).
+            # Unirse a la sala de chat
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
 
-            # Aceptar la conexión WebSocket.
+            # Aceptar la conexión
             await self.accept()
-
-        # except Exception as e:
-        #     # Si algo falla en los pasos anteriores, lo imprimiremos aquí
-        #     print(f"!!! ERROR en el método connect: {e}")
-        #     # También imprimiremos el objeto 'scope' para ver qué contiene
-        #     print("SCOPE:", self.scope)
-        # # --- FIN DE CÓDIGO DE DEPURACIÓN ---
+        else:
+            # Si no está autenticado, rechazar la conexión.
+            await self.close()
 
     async def disconnect(self, close_code):
-        print(f"--- Desconectado de la sala {self.room_name} ---")
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        # Solo intenta salir del grupo si el usuario se conectó correctamente
+        if hasattr(self, 'room_group_name'):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
 
-    # ... (el resto del archivo 'receive' y 'chat_message' se queda igual) ...
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        sender = text_data_json['sender']
+        message_content = text_data_json['message']
+        
+        # Para mayor seguridad, usamos el ID del usuario de la conexión (scope)
+        # en lugar del que envía el frontend.
+        sender_id = self.scope['user'].id
 
+        # Guardar el mensaje en la base de datos
+        new_message = await self.save_message(sender_id, message_content)
+        
+        # Serializar el mensaje para enviarlo con todos sus datos (ID, timestamp, etc.)
+        serializer = MessageSerializer(new_message)
+        
+        # Enviar el mensaje completo a todos en la sala de chat
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message,
-                'sender': sender
+                'message': serializer.data
             }
         )
 
     async def chat_message(self, event):
         message = event['message']
-        sender = event['sender']
+
+        # Enviar el objeto de mensaje completo al WebSocket
         await self.send(text_data=json.dumps({
-            'message': message,
-            'sender': sender
+            'message': message
         }))
+ 
+    @database_sync_to_async
+    def save_message(self, sender_id, message_content):
+        sender = User.objects.get(id=sender_id)
+        conversation = Conversation.objects.get(id=self.room_name)
+        message = Message.objects.create(
+            conversation=conversation,
+            sender=sender,
+            content=message_content
+        )
+        return message

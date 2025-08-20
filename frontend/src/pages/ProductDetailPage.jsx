@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../services/api'
 import MapDisplay from '../components/MapDisplay';
 
 const ProductDetailPage = () => {
@@ -15,12 +16,8 @@ const ProductDetailPage = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                // --- AÑADE EL TOKEN AQUÍ TAMBIÉN PARA VER PRODUCTOS ---
-                const accessToken = localStorage.getItem('accessToken');
-                const res = await axios.get(`http://127.0.0.1:8000/api/products/${id}/`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                setProduct(res.data);
+               const res = await api.get(`/products/${id}/`);
+               setProduct(res.data);
             } catch (err) {
                 console.error('Error fetching product:', err);
                 setError('No se pudo encontrar el producto.');
@@ -38,26 +35,12 @@ const ProductDetailPage = () => {
         }
 
         try {
-            // --- 1. Obtén el token del localStorage ---
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert("Por favor, inicia sesión para chatear.");
-                navigate('/auth');
-                return;
-            }
-
-            // --- 2. Haz la llamada POST con el token en las cabeceras ---
-            const res = await axios.post('http://127.0.0.1:8000/api/chat/start/', 
-                { participant_id: product.owner }, // El cuerpo de la petición
-                { // La configuración de la petición
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                }
-            );
+            const res = await api.post('/chat/start/', { 
+                participant_id: product.owner 
+            });
 
             const conversationId = res.data.id;
-            navigate(`/chat/${conversationId}`);
+            navigate(`/messages?open=${conversationId}`);
 
         } catch (err) {
             console.error("Error al iniciar la conversación", err);

@@ -1,7 +1,8 @@
 // frontend/src/pages/HomePage.jsx
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../services/api'
 import ProductUpload from './ProductUpload';
 import ProductList from './ProductList';
 
@@ -13,7 +14,7 @@ const HomePage = () => {
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('http://127.0.0.1:8000/api/products/');
+            const res = await api.get('/products/');
             setProducts(res.data);
         } catch (err) {
             console.error('Error fetching products:', err);

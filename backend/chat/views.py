@@ -3,47 +3,74 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .models import Conversation
-from .serializers import ConversationSerializer
+from .models import Conversation, Message
+from .serializers import ConversationSerializer, MessageSerializer
 from django.db.models import Q
 
 class StartConversationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # El ID del usuario con el que queremos chatear (el vendedor)
-        participant_id = request.data.get('participant_id')
+      # El ID del usuario con el que queremos chatear (el vendedor)
+      participant_id = request.data.get('participant_id')
 
-        if not participant_id:
-            return Response({'error': 'Participant ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+      if not participant_id:
+          return Response({'error': 'Participant ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
+      try:
+          participant = User.objects.get(id=participant_id)
+      except User.DoesNotExist:
+          return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+      # Busca una conversación que tenga exactamente a estos dos participantes
+      conversation = Conversation.objects.filter(
+          participants=request.user
+      ).filter(
+          participants=participant
+      )
+
+      # Esta parte es para asegurar que solo devuelva conversaciones de 2 personas
+      # Si quisieras chats grupales, la lógica sería diferente.
+      exact_conversation = None
+      for conv in conversation:
+          if conv.participants.count() == 2:
+              exact_conversation = conv
+              break
+
+      if exact_conversation:
+          # Si ya existe, la devolvemos
+          serializer = ConversationSerializer(exact_conversation)
+          return Response(serializer.data, status=status.HTTP_200_OK)
+      else:
+          # Si no existe, creamos una nueva
+          new_conversation = Conversation.objects.create()
+          new_conversation.participants.add(request.user, participant)
+          serializer = ConversationSerializer(new_conversation)
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class ConversationListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        # Filtramos las conversaciones para obtener solo aquellas
+        # en las que el usuario actual es un participante.
+        conversations = Conversation.objects.filter(participants=request.user)
+        serializer = ConversationSerializer(conversations, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class MessageListView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, conversation_id, *args, **kwargs):
+        # Nos aseguramos de que la conversación exista y que el usuario sea parte de ella
         try:
-            participant = User.objects.get(id=participant_id)
-        except User.DoesNotExist:
-            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+            conversation = Conversation.objects.get(id=conversation_id)
+            if request.user not in conversation.participants.all():
+                return Response({'error': 'Not a participant of this conversation.'}, status=status.HTTP_403_FORBIDDEN)
+        except Conversation.DoesNotExist:
+            return Response({'error': 'Conversation not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Busca una conversación que tenga exactamente a estos dos participantes
-        conversation = Conversation.objects.filter(
-            participants=request.user
-        ).filter(
-            participants=participant
-        )
-
-        # Esta parte es para asegurar que solo devuelva conversaciones de 2 personas
-        # Si quisieras chats grupales, la lógica sería diferente.
-        exact_conversation = None
-        for conv in conversation:
-            if conv.participants.count() == 2:
-                exact_conversation = conv
-                break
-
-        if exact_conversation:
-            # Si ya existe, la devolvemos
-            serializer = ConversationSerializer(exact_conversation)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            # Si no existe, creamos una nueva
-            new_conversation = Conversation.objects.create()
-            new_conversation.participants.add(request.user, participant)
-            serializer = ConversationSerializer(new_conversation)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Obtenemos los mensajes de la conversación
+        messages = conversation.messages.all()
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

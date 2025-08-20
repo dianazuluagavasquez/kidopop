@@ -1,7 +1,8 @@
 // frontend/src/Register.jsx
 
 import React, { useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../services/api'
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const Register = () => {
         try {
             // Hacemos la petición POST a nuestro endpoint de Django
             // Asegúrate de que la URL es correcta. Por defecto es http://127.0.0.1:8000
-            const res = await axios.post('http://127.0.0.1:8000/api/register/', formData);
+            const res = await api.post('/register/', formData);
 
             console.log('Respuesta del servidor:', res.data);
             setMessage('¡Registro exitoso! Ahora puedes iniciar sesión.');

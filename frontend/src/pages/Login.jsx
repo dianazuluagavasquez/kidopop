@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
@@ -23,19 +24,17 @@ const Login = () => {
         try {
             // Hacemos la petición a la ruta '/api/token/' que acabamos de crear
             const res = await axios.post('http://127.0.0.1:8000/api/token/', formData);
-
-            // Si las credenciales son correctas, Django nos devuelve los tokens
             const { access, refresh } = res.data;
 
-            // Guardamos los tokens en el localStorage del navegador para mantener la sesión
             localStorage.setItem('accessToken', access);
             localStorage.setItem('refreshToken', refresh);
 
-            // MUY IMPORTANTE: Configuramos axios para que envíe el token de acceso
-            // en la cabecera de todas las futuras peticiones.
-            axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+            api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
-            setMessage('¡Inicio de sesión exitoso!');
+            if (onLoginSuccess) {
+                onLoginSuccess();
+            }
+
             navigate('/');
 
         } catch (err) {

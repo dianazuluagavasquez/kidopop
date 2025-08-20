@@ -1,7 +1,8 @@
 // frontend/src/pages/ProductUpload.jsx
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
+import api from '../services/api'
 
 const ProductUpload = ({ onProductUploaded }) => {
     // --- ESTADOS DEL FORMULARIO ---
@@ -29,7 +30,8 @@ const ProductUpload = ({ onProductUploaded }) => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get('http://127.0.0.1:8000/api/products/categories/');
+                // const res = await axios.get('http://127.0.0.1:8000/api/products/categories/');
+                const res = await api.get('/products/categories/');
                 setCategories(res.data);
             } catch (err) {
                 console.error("No se pudieron cargar las categorías", err);
@@ -82,22 +84,13 @@ const ProductUpload = ({ onProductUploaded }) => {
         });
 
         try {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                setMessage('Debes iniciar sesión para subir un producto.');
-                setLoading(false);
-                return;
-            }
-
-            const res = await axios.post('http://127.0.0.1:8000/api/products/', uploadData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
+    
+            const res = await api.post('/products/', uploadData);
 
             setMessage('¡Producto subido con éxito!');
-            if (onProductUploaded) onProductUploaded(); // Avisa al componente padre para que refresque la lista
+            if (onProductUploaded) onProductUploaded();
+
+
         
         } catch (err) {
             console.error('Error al subir el producto:', err.response ? err.response.data : err);

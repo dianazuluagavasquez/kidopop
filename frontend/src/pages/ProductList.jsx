@@ -1,7 +1,7 @@
 // frontend/src/pages/ProductList.jsx
 
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api'
 import { Link } from 'react-router-dom'; 
 
 const ProductList = ({ products, loading, error }) => {

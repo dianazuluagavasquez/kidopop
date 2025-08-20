@@ -1,20 +1,26 @@
 # backend/core/asgi.py
 
 import os
-from django.core.asgi import get_asgi_application
+import django
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-import chat.routing
+from django.core.asgi import get_asgi_application
 
+# Esta línea DEBE ser la primera, antes de cualquier otra importación de Django.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
-# Este es el "controlador de tráfico" principal
+# Esta llamada asegura que los settings de Django se carguen.
+django.setup()
+
+# AHORA, y solo ahora, importamos el resto de componentes que dependen de Django.
+from chat.middleware import TokenAuthMiddleware
+import chat.routing
+
 application = ProtocolTypeRouter({
-    # Para peticiones normales (HTTP), usa la configuración estándar de Django
+    # La llamada a get_asgi_application() se queda aquí para las peticiones HTTP.
     "http": get_asgi_application(),
 
-    # Para peticiones en tiempo real (WebSocket), usa el enrutador de Channels
-    "websocket": AuthMiddlewareStack(
+    # Para WebSockets, usamos nuestra configuración de Channels.
+    "websocket": TokenAuthMiddleware(
         URLRouter(
             chat.routing.websocket_urlpatterns
         )
