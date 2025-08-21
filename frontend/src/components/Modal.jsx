@@ -1,7 +1,7 @@
 // frontend/src/components/Modal.jsx
 
 import React from 'react';
-import './Modal.css';
+import './Modal.scss';
 
 const Modal = ({ isOpen, onClose, onConfirm, title, children }) => {
     if (!isOpen) {

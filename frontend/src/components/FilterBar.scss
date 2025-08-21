@@ -1,0 +1,23 @@
+/* frontend/src/components/FilterBar.css */
+.filter-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+}
+.search-input {
+    flex-grow: 1; /* Ocupa el espacio disponible */
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.category-select {
+    min-width: 200px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}

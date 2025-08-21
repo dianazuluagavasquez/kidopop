@@ -1,7 +1,7 @@
 // frontend/src/components/FilterBar.jsx
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import './FilterBar.css';
+import './FilterBar.scss';
 
 // El componente ahora recibe más props para funcionar
 const FilterBar = ({ searchTerm, onSearchChange, selectedCategory, onCategoryChange }) => {

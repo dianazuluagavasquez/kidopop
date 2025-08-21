@@ -1,6 +1,6 @@
 // frontend/src/components/ConversationList.jsx
 import React from 'react';
-import './ConversationList.css';
+import './ConversationList.scss';
 
 // El componente ahora es "tonto": solo recibe datos y los muestra
 const ConversationList = ({ onSelectConversation, selectedConversationId, conversations, loading }) => {

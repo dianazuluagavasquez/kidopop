@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
 import Modal from '../components/Modal'; // <-- 1. Importa el Modal
-import './ProfilePage.css';
+import './ProfilePage.scss';
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);

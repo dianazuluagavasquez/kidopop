@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import api from '../services/api';
-import './ChatWindow.css';
+import './ChatWindow.scss';
 
 const ChatWindow = ({ conversationId, participant }) => {
     const [messages, setMessages] = useState([]);

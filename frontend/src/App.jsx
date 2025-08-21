@@ -13,7 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 import ProductEditPage from './pages/ProductEditPage';
 
 import api from './services/api';
-import './App.css';
+import './App.scss';
 
 const PrivateRoute = ({ children }) => {
     const token = localStorage.getItem('accessToken');

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import LocationSearchInput from './LocationSearchInput';
-import './ProductUploadForm.css';
+import './ProductUploadForm.scss';
 
 const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
     const isEditMode = productToEdit !== null;

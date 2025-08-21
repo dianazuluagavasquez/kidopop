@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import ProductCard from './ProductCard';
 import FilterBar from './FilterBar';
-import './ProductList.css';
+import './ProductList.scss';
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './ProductCard.css';
+import './ProductCard.scss';
 
 const ProductCard = ({ product, isOwnerView = false, onMarkAsSold, onDelete }) => {
     
