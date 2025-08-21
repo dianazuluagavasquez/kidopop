@@ -3,10 +3,11 @@
 from rest_framework import generics, permissions
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer
+from .permissions import IsOwnerOrReadOnly
 
 # Esta clase se encarga de listar todos los productos y de crear nuevos
 class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(status='available')
     serializer_class = ProductSerializer
     # Permite que cualquiera vea la lista, pero solo usuarios
     # autenticados pueden crear productos.
@@ -20,7 +21,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 # Vista para listar todas las categorías
 class CategoryListView(generics.ListAPIView):

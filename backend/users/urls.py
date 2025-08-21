@@ -1,7 +1,7 @@
 # backend/users/urls.py
 
 from django.urls import path
-from .views import RegisterView
+from .views import RegisterView, ProfileView
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -17,4 +17,5 @@ urlpatterns = [
 
     # 2. Esta ruta servirá en el futuro para renovar un token sin volver a loguearse
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('profile/', ProfileView.as_view(), name='user-profile'),
 ]

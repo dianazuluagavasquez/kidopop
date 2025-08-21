@@ -1,0 +1,9 @@
+/* frontend/src/components/ProductList.css */
+
+.product-list-grid {
+    display: flex;
+    /* Crea columnas flexibles que se ajustan al tamaño */
+    gap: 30px; /* Espacio entre las tarjetas */
+    padding: 20px 0;
+    flex-wrap: wrap;
+}

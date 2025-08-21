@@ -1,8 +1,8 @@
 // frontend/src/pages/AuthPage.jsx
 
 import React from 'react';
-import Login from './Login';
-import Register from './Register';
+import Login from '../components/Login';
+import Register from '../components/Register';
 
 const AuthPage = ({ handleLogin }) => {
   return (

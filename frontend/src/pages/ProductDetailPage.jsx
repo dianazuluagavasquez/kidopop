@@ -35,6 +35,7 @@ const ProductDetailPage = () => {
         }
 
         try {
+
             const res = await api.post('/chat/start/', { 
                 participant_id: product.owner 
             });
@@ -43,8 +44,8 @@ const ProductDetailPage = () => {
             navigate(`/messages?open=${conversationId}`);
 
         } catch (err) {
-            console.error("Error al iniciar la conversación", err);
-            alert("Hubo un error al iniciar el chat. Inténtalo de nuevo.");
+
+            console.error("Error al iniciar la conversación. La redirección será manejada por el interceptor.", err);
         }
     };
 

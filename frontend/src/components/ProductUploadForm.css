@@ -1,0 +1,98 @@
+/* frontend/src/components/ProductUploadForm.css */
+
+.form-container {
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.form-container h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.product-form .form-group {
+    margin-bottom: 20px;
+}
+
+.product-form .form-group-inline {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.product-form .form-group-inline .form-group {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.product-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.product-form input[type="text"],
+.product-form input[type="number"],
+.product-form textarea,
+.product-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Importante para que el padding no afecte el ancho */
+}
+
+.product-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.product-form .category-select {
+    min-height: 120px;
+}
+
+.image-preview {
+    max-width: 150px;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    background-color: #3498db;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+    background-color: #2980b9;
+}
+
+.submit-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+.form-message {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
+}
