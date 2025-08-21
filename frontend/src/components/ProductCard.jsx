@@ -6,12 +6,8 @@ import './ProductCard.css';
 
 const ProductCard = ({ product, isOwnerView = false, onMarkAsSold, onDelete }) => {
     
-    // --- LÓGICA DE IMAGEN A PRUEBA DE ERRORES ---
-    let imageUrl = 'https://placehold.co/600x400'; // Imagen por defecto
-
+    let imageUrl = 'https://placehold.co/600x400';
     if (product.image) {
-        // Si la ruta de la imagen ya empieza con 'http', la usamos directamente.
-        // Si no, construimos la URL completa.
         if (product.image.startsWith('http')) {
             imageUrl = product.image;
         } else {
@@ -40,6 +36,13 @@ const ProductCard = ({ product, isOwnerView = false, onMarkAsSold, onDelete }) =
                 <div className="product-card-info">
                     <p className="product-card-price">{parseFloat(product.price).toFixed(2)} €</p>
                     <h3 className="product-card-title">{product.title}</h3>
+
+                    {/* --- ¡AQUÍ ESTÁ LA LÓGICA PARA MOSTRAR LAS CATEGORÍAS! --- */}
+                    <div className="product-card-categories">
+                        {product.categories && product.categories.map(cat => (
+                            <span key={cat.id} className="category-tag">{cat.name}</span>
+                        ))}
+                    </div>
                 </div>
             </Link>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 
-// ... (todas tus importaciones de páginas)
+// Importa tus páginas
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import ProductDetailPage from './pages/ProductDetailPage';
@@ -21,7 +21,6 @@ const PrivateRoute = ({ children }) => {
 };
 
 const Navbar = ({ isLoggedIn, handleLogout, hasUnreadMessages }) => {
-    // ... (El código de tu Navbar no necesita cambios)
     return (
         <nav>
             <Link to="/"><h1>KidoPop Marketplace</h1></Link>
@@ -50,13 +49,12 @@ const Navbar = ({ isLoggedIn, handleLogout, hasUnreadMessages }) => {
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
-    // --- 1. NUEVO ESTADO DE CARGA ---
     const [loadingAuth, setLoadingAuth] = useState(true);
 
     const fetchUnreadStatus = async () => {
         try {
             const res = await api.get('/chat/unread-count/');
-            setHasUnreadMessages(res.data.has_unread_messages);
+            setHasUnreadMessages(res.data.has_unreads);
         } catch (err) {
             console.error("Error al obtener el estado de no leídos", err);
             setHasUnreadMessages(false);
@@ -70,20 +68,29 @@ function App() {
             setIsLoggedIn(true);
             fetchUnreadStatus();
         }
-        // --- 2. FINALIZA LA CARGA DE AUTENTICACIÓN ---
-        // Haya o no token, hemos terminado de comprobarlo.
         setLoadingAuth(false);
     }, []);
 
-    const handleLogout = () => { /* ... (sin cambios) */ };
-    const handleLogin = () => { /* ... (sin cambios) */ };
+    const handleLogout = () => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        delete api.defaults.headers.common['Authorization'];
+        setIsLoggedIn(false);
+        setHasUnreadMessages(false);
+        // --- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA! ---
+        // Esto redirige al usuario a la página de inicio.
+        window.location.href = '/';
+    };
 
-    // --- 3. RENDERIZADO CONDICIONAL ---
-    // Si todavía estamos comprobando el token, muestra un mensaje de carga.
+    const handleLogin = () => {
+        setIsLoggedIn(true);
+        fetchUnreadStatus();
+    };
+
     if (loadingAuth) {
         return <div>Cargando aplicación...</div>;
     }
-console.log("Estado de mensajes no leídos (App.jsx):", hasUnreadMessages);
+
     return (
         <Router>
             <div className="App">

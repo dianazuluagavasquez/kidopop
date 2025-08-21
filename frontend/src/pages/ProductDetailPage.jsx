@@ -58,6 +58,11 @@ const ProductDetailPage = () => {
             {product.image && <img src={product.image} alt={product.title} style={{ maxWidth: '400px', borderRadius: '8px' }} />}
             <h1>{product.title}</h1>
             <h2>{product.price} €</h2>
+            <div className="categories-container">
+                {product.categories && product.categories.map(cat => (
+                    <span key={cat.id} className="category-tag-detail">{cat.name}</span>
+                ))}
+            </div>
             <p><strong>Estado:</strong> {product.condition}</p>
             <p><strong>Marca:</strong> {product.brand || 'No especificada'}</p>
             <p><strong>Descripción:</strong></p>
