@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import api from '../services/api';
+import './ChatWindow.css';
 
-const ChatWindow = ({ conversationId }) => {
+const ChatWindow = ({ conversationId, participant }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
@@ -25,8 +26,6 @@ const ChatWindow = ({ conversationId }) => {
         setMessages([]);
 
         const fetchAndConnect = async () => {
-            // 1. Cargar historial de mensajes.
-            // Ya no necesitamos pasar el token manualmente, 'api' se encarga de todo.
             try {
                 const res = await api.get(`/chat/conversations/${conversationId}/messages/`);
                 setMessages(res.data);
@@ -34,8 +33,6 @@ const ChatWindow = ({ conversationId }) => {
                 console.error("Error al cargar el historial de mensajes", error);
             }
 
-            // 2. Conectar al WebSocket.
-            // Obtenemos el token aquí solo para pasarlo en la URL.
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) return;
 
@@ -73,33 +70,38 @@ const ChatWindow = ({ conversationId }) => {
 
         ws.current.send(JSON.stringify({
             'message': newMessage
-            // Ya no es necesario enviar el 'sender', el backend lo sabe por el token
         }));
         
         setNewMessage('');
     };
 
-    if (!conversationId) {
-        return <div style={{ textAlign: 'center', color: '#888', marginTop: '50px' }}>Selecciona una conversación para empezar a chatear.</div>;
+    if (!conversationId || !participant) {
+        return <div className="chat-placeholder">Selecciona una conversación para empezar a chatear.</div>;
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <h2>Chat</h2>
-            <div style={{ flexGrow: 1, border: '1px solid #ccc', overflowY: 'scroll', padding: '10px', marginBottom: '10px' }}>
-                {messages.map((msg) => (
-                    <div 
-                        key={msg.id} // Usa un ID único del mensaje si lo tienes, es mejor que el index
-                        style={{ textAlign: msg.sender === currentUser?.id ? 'right' : 'left', marginBottom: '10px' }}
-                    >
-                        <p style={{
-                            display: 'inline-block', padding: '8px 12px', borderRadius: '10px',
-                            backgroundColor: msg.sender === currentUser?.id ? '#dcf8c6' : '#f1f0f0'
-                        }}>
-                            {msg.content} {/* El contenido del mensaje está en 'content' */}
-                        </p>
-                    </div>
-                ))}
+        <div className="chat-window">
+            <div className="chat-header">
+                <h3>Chat con {participant.username}</h3>
+            </div>
+            <div className="messages-area">
+                {messages.map((msg) => {
+                    // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
+                    // Comparamos los valores como números para evitar errores de tipo.
+                    const isSentByCurrentUser = currentUser && Number(msg.sender) === Number(currentUser.id);
+                    
+                    return (
+                        <div 
+                            key={msg.id}
+                            className={`message-bubble ${isSentByCurrentUser ? 'sent' : 'received'}`}
+                        >
+                            {!isSentByCurrentUser && (
+                                <div className="sender-name">{msg.sender_username}</div>
+                            )}
+                            <div className="message-content">{msg.content}</div>
+                        </div>
+                    );
+                })}
                 <div ref={messagesEndRef} />
             </div>
             <form onSubmit={handleSendMessage} style={{ display: 'flex' }}>

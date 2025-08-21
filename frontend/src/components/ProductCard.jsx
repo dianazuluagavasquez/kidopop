@@ -5,10 +5,19 @@ import { Link } from 'react-router-dom';
 import './ProductCard.css';
 
 const ProductCard = ({ product, isOwnerView = false, onMarkAsSold, onDelete }) => {
-    // Esta parte para la imagen ya es correcta y la mantenemos
-    const imageUrl = product.image
-        ? `http://127.0.0.1:8000${product.image}`
-        : 'https://placehold.co/600x400';
+    
+    // --- LÓGICA DE IMAGEN A PRUEBA DE ERRORES ---
+    let imageUrl = 'https://placehold.co/600x400'; // Imagen por defecto
+
+    if (product.image) {
+        // Si la ruta de la imagen ya empieza con 'http', la usamos directamente.
+        // Si no, construimos la URL completa.
+        if (product.image.startsWith('http')) {
+            imageUrl = product.image;
+        } else {
+            imageUrl = `http://127.0.0.1:8000${product.image}`;
+        }
+    }
 
     const handleSoldClick = (e) => {
         e.preventDefault();
@@ -34,20 +43,17 @@ const ProductCard = ({ product, isOwnerView = false, onMarkAsSold, onDelete }) =
                 </div>
             </Link>
 
-            {/* --- LÓGICA DE BOTONES CORREGIDA Y SIMPLIFICADA --- */}
             {isOwnerView && (
                 <div className="owner-actions-container">
-                    {/* Estos botones solo aparecen si el producto está disponible */}
                     {product.status === 'available' && (
                         <div className="owner-actions">
-                            <Link to={`/product/${product.id}/edit`} className="edit-button-link">
+                             <Link to={`/product/${product.id}/edit`} className="edit-button-link">
                                 <button className="edit-button">Editar</button>
                             </Link>
                             <button className="sold-button" onClick={handleSoldClick}>Vendido</button>
                         </div>
                     )}
                     
-                    {/* El botón de eliminar siempre aparece en la vista de perfil */}
                     <div className="owner-actions-delete">
                         <button className="delete-button" onClick={handleDeleteClick}>Eliminar</button>
                     </div>

@@ -2,23 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-//import './ProductUploadForm.css'; 
+import LocationSearchInput from './LocationSearchInput';
+import './ProductUploadForm.css';
 
 const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
     const isEditMode = productToEdit !== null;
 
     const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        price: '',
-        brand: '',
-        condition: 'new',
+        title: '', description: '', price: '', brand: '', condition: 'new',
     });
     const [image, setImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
-    const [locationText, setLocationText] = useState('');
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [locationData, setLocationData] = useState({
+        text: '', lat: null, lon: null
+    });
+    const [geolocationAttempted, setGeolocationAttempted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
@@ -41,29 +41,77 @@ const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
                 brand: productToEdit.brand || '',
                 condition: productToEdit.condition,
             });
-            setLocationText(productToEdit.location_text || '');
+            setLocationData({
+                text: productToEdit.location_text || '',
+                lat: productToEdit.latitude,
+                lon: productToEdit.longitude
+            });
+            setGeolocationAttempted(true);
             const categoryIds = productToEdit.categories.map(cat => cat.id.toString());
             setSelectedCategories(categoryIds);
             if (productToEdit.image) {
                 setImagePreview(`http://127.0.0.1:8000${productToEdit.image}`);
             }
+        } else {
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                    const data = await response.json();
+                    
+                    // Usamos la misma lógica robusta para limpiar la dirección
+                    handleLocationSelect({
+                        text: data.display_name,
+                        lat: latitude,
+                        lon: longitude,
+                        address: data.address
+                    });
+                    setGeolocationAttempted(true);
+                },
+                (error) => {
+                    console.error("Geolocalización denegada:", error);
+                    setGeolocationAttempted(true);
+                }
+            );
         }
     }, [productToEdit, isEditMode]);
 
     const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
     const onFileChange = (e) => {
         if (e.target.files[0]) {
             setImage(e.target.files[0]);
             setImagePreview(URL.createObjectURL(e.target.files[0]));
         }
     };
-
     const onCategoryChange = (e) => {
         const value = Array.from(e.target.selectedOptions, option => option.value);
         setSelectedCategories(value);
     };
 
+    // --- FUNCIÓN CORREGIDA Y ROBUSTA ---
+    const handleLocationSelect = (selectedLocation) => {
+        let cleanText = selectedLocation.text; // Usamos el texto completo como fallback
+
+        // Intentamos construir la dirección limpia solo si 'address' existe
+        if (selectedLocation.address) {
+            const { address } = selectedLocation;
+            const city = address.city || address.town || address.village || '';
+            const state = address.state || '';
+            const country = address.country || '';
+            
+            const parts = [city, state, country].filter(Boolean); // Filtra partes vacías
+            if (parts.length > 0) {
+                cleanText = parts.join(', ');
+            }
+        }
+        
+        setLocationData({
+            text: cleanText,
+            lat: selectedLocation.lat,
+            lon: selectedLocation.lon
+        });
+    };
+    
     const onSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -75,10 +123,15 @@ const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
         uploadData.append('price', formData.price);
         uploadData.append('brand', formData.brand);
         uploadData.append('condition', formData.condition);
-        uploadData.append('location_text', locationText);
         selectedCategories.forEach(catId => uploadData.append('category_ids', catId));
         if (image) {
             uploadData.append('image', image, image.name);
+        }
+        
+        uploadData.append('location_text', locationData.text);
+        if (locationData.lat && locationData.lon) {
+            uploadData.append('latitude', parseFloat(locationData.lat).toFixed(6));
+            uploadData.append('longitude', parseFloat(locationData.lon).toFixed(6));
         }
 
         try {
@@ -87,12 +140,10 @@ const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
                 : await api.post('/products/', uploadData);
             
             setMessage(isEditMode ? '¡Producto actualizado con éxito!' : '¡Producto subido con éxito!');
-
-            if (onFormSubmit) {
-                onFormSubmit(res.data);
-            }
+            if (onFormSubmit) onFormSubmit(res.data);
         } catch (err) {
-            setMessage('Hubo un error. Revisa los campos e inténtalo de nuevo.');
+            setMessage('Hubo un error al guardar. Revisa los campos.');
+            console.error("Error al guardar:", err.response ? err.response.data : err);
         } finally {
             setLoading(false);
         }
@@ -143,8 +194,15 @@ const ProductUploadForm = ({ productToEdit = null, onFormSubmit }) => {
                 </div>
                 
                 <div className="form-group">
-                    <label htmlFor="location_text">Ubicación (Ciudad, Provincia)</label>
-                    <input id="location_text" type="text" value={locationText} onChange={(e) => setLocationText(e.target.value)} placeholder="Ej: Madrid, España" />
+                    <label htmlFor="location">Ubicación</label>
+                    {geolocationAttempted ? (
+                        <LocationSearchInput
+                            onLocationSelect={handleLocationSelect}
+                            initialValue={locationData.text}
+                        />
+                    ) : (
+                        <p>Detectando tu ubicación...</p>
+                    )}
                 </div>
 
                 <div className="form-group">
