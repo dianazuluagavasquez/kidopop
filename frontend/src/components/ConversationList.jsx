@@ -1,11 +1,13 @@
 // frontend/src/components/ConversationList.jsx
 import React from 'react';
+import Loader from './Loader';
+
 import './ConversationList.scss';
 
 // El componente ahora es "tonto": solo recibe datos y los muestra
 const ConversationList = ({ onSelectConversation, selectedConversationId, conversations, loading }) => {
 
-    if (loading) return <p>Cargando...</p>;
+    if (loading) return <Loader />;;
 
     return (
         <div className="conversation-list">

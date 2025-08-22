@@ -1,0 +1,53 @@
+ //VARIABLES
+ // Colores
+  $color-principal:  #4EC4B9;
+  $color-acento:  #F56662;
+  $color-texto:  #212733;
+  $color-texto-secundario:  #495360;
+  $color-border-grey: #C4DCDA;
+   $color-border-grey-sec: #A0AEC0;
+  $color-basic-w: #fff;
+
+//Font family
+  $fuente-titulos: 'Quicksand', sans-serif;
+  $fuente-cuerpo: 'Lato', sans-serif;
+
+  // Border-Radius
+  $border-btn: 8px;
+  $border: 8px;
+
+  //Altura Botones
+  $altura-btn-m: 40px;
+  $padding-btn-m: 24px;
+
+  // Tamaño fuentes
+  $font-size-title-l: 36px;
+  $font-size-subtitle-l: 24px;
+  $font-size-category-l: 16px;
+  $font-size-price-l: 16px;
+  $font-size-title-pd-l: 14px;
+  $font-size-description-pd-l: 14px;
+
+  $font-size-btn-m: 16px;
+
+  //Espacios
+  $space-xs: 4px;
+  $space-s: 8px;
+  $space-sm: 16px;
+  $space-m: 24px;
+  $space-l: 32px;
+  $space-xl: 40px;
+
+
+
+//Wraps
+
+$page-width: 1280px;
+
+// Media query break points
+
+$phone-breakpoint: 320px;
+$tablet-breakpoint: 720px;
+$desktop-breakpoint: 960px;
+$wide-breakpoint: 1200px;
+

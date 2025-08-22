@@ -1,33 +1,32 @@
 // frontend/src/components/ProductList.jsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom'; 
 import api from '../services/api';
 import ProductCard from './ProductCard';
-import FilterBar from './FilterBar';
+import SearchBar from './SearchBar'; 
+import Loader from './Loader';
+// import CategoryButtons from './CategoryButtons'; 
 import './ProductList.scss';
 
-const ProductList = () => {
+const ProductList = ({ selectedCategory, isLoggedIn }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     
-    // --- 1. ESTADOS SEPARADOS PARA CADA FILTRO ---
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('');
+    // const [selectedCategory, setSelectedCategory] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
-    // --- 2. EFECTO "DEBOUNCE" PARA LA BÚSQUEDA ---
-    // Solo actualiza el término de búsqueda para la API 500ms después de que dejas de escribir.
     useEffect(() => {
         const timerId = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
-        }, 500); // Espera medio segundo
+        }, 500); 
 
         return () => {
-            clearTimeout(timerId); // Limpia el temporizador si vuelves a escribir
+            clearTimeout(timerId); 
         };
     }, [searchTerm]);
 
-    // --- 3. LA LLAMADA A LA API AHORA DEPENDE DE LOS FILTROS SEPARADOS ---
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
@@ -35,9 +34,7 @@ const ProductList = () => {
             if (debouncedSearchTerm) {
                 params.append('search', debouncedSearchTerm);
             }
-            if (selectedCategory) {
-                params.append('category', selectedCategory);
-            }
+            if (selectedCategory) params.append('category', selectedCategory);
 
             const res = await api.get(`/products/?${params.toString()}`);
             setProducts(res.data);
@@ -46,23 +43,27 @@ const ProductList = () => {
         } finally {
             setLoading(false);
         }
-    }, [debouncedSearchTerm, selectedCategory]); // Se ejecuta si cambia la búsqueda o la categoría
+    }, [debouncedSearchTerm, selectedCategory]); 
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
 
     return (
-        <div>
-            <h2>Encuentra lo que buscas</h2>
-            <FilterBar
+        <div>  
+            <SearchBar
                 searchTerm={searchTerm}
-                onSearchChange={setSearchTerm} // Pasa la función para actualizar la búsqueda
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory} // Pasa la función para actualizar la categoría
+                onSearchChange={setSearchTerm}
             />
 
-            {loading && <p>Cargando productos...</p>}
+            {!isLoggedIn && (
+                <div className="k-c-btn">
+                    <Link to="/auth" className="k-btn">Empieza a Vender Ahora</Link>
+                    <Link to="/como-funciona" className="k-nav-link">¿Cómo Funciona?</Link>
+                </div>
+            )}
+
+            {loading && <Loader />}
             {error && <p>{error}</p>}
             {!loading && !error && (
                 <div className="product-list-grid">

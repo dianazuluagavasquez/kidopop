@@ -1,0 +1,45 @@
+@use './variables' as v;
+
+body {
+  font-size: 14px;
+  line-height: 18px;
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  color: #212733;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  margin: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: v.$fuente-titulos;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.k-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: v.$altura-btn-m;
+    padding: 0 v.$space-m;
+    font-size:  v.$font-size-btn-m;
+    transition: .3s;
+    color: v.$color-basic-w;
+    background: v.$color-principal;
+    border-radius: v.$border-btn;
+    position: relative;
+    cursor: pointer;
+}
+
+.k-btn-ln {
+  background: transparent;
+  border: 1px solid v.$color-principal;
+  color: v.$color-texto;
+}

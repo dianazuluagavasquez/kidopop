@@ -1,0 +1,16 @@
+@use '../style/variables' as v;
+
+.k-cat-btn-c {
+  width: 100%;
+  
+
+  &__btn {
+    font-size: v.$font-size-category-l;
+    margin-right: v.$space-sm;
+    transition: .3s;
+
+    &.active {
+      color: v.$color-principal;
+    }
+  }
+}

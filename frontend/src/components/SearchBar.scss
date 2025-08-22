@@ -1,0 +1,15 @@
+@use '../style/variables' as v;
+
+.k-seach-c {
+    display: flex;
+    justify-content: center;
+    margin-bottom: v.$space-l;
+
+  input {
+    height: v.$altura-btn-m;
+    width: 70%;
+    border: 1px solid v.$color-border-grey-sec;
+    border-radius: v.$border;
+    padding-left: 16px;
+  }
+}

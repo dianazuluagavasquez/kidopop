@@ -11,9 +11,14 @@ import ChatLayoutPage from './pages/ChatLayoutPage';
 import ProductUploadPage from './pages/ProductUploadPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductEditPage from './pages/ProductEditPage';
+import CategoryButtons from './components/CategoryButtons';
+import Loader from './components/Loader';
 
 import api from './services/api';
 import './App.scss';
+
+//imagenes
+import kidoPopLogo from './assets/img/kidopop.svg';
 
 const PrivateRoute = ({ children }) => {
     const token = localStorage.getItem('accessToken');
@@ -22,27 +27,31 @@ const PrivateRoute = ({ children }) => {
 
 const Navbar = ({ isLoggedIn, handleLogout, hasUnreadMessages }) => {
     return (
-        <nav>
-            <Link to="/"><h1>KidoPop Marketplace</h1></Link>
-            <div>
-                {isLoggedIn ? (
-                    <>
-                        <Link to="/upload-product" className="nav-button">Vender</Link>
-                        <Link to="/messages" className="nav-link">
-                            Mis Mensajes
-                            {hasUnreadMessages && <span className="notification-dot"></span>}
-                        </Link>
-                        <Link to="/profile" className="nav-link">Mi Perfil</Link>
-                        <button onClick={handleLogout}>Cerrar Sesión</button>
-                    </>
-                ) : (
-                    <>
-                        <Link to="/auth" className="nav-link">Regístrate o Inicia sesión</Link>
-                        <Link to="/auth" className="nav-button">Vender</Link>
-                    </>
-                )}
+        <header className='k-h'>
+            <div className='k-h-c k-c'>
+            <Link to="/" className='k-lg'><img src={kidoPopLogo} alt="" /></Link>
+            <nav className='k-nav'>
+                <div className='k-nav-c'>
+                    {isLoggedIn ? (
+                        <>
+                            <Link className='k-nav-link  k-btn' to="/upload-product" >Vender</Link>
+                            <Link className='k-nav-link' to="/messages" >
+                                Mis Mensajes
+                                {hasUnreadMessages && <span className="notification-dot"></span>}
+                            </Link>
+                            <Link className='k-nav-link' to="/profile">Mi Perfil</Link>
+                            <button onClick={handleLogout}>Cerrar Sesión</button>
+                        </>
+                    ) : (
+                        <>
+                            <Link  to="/auth" className="k-nav-link k-btn k-btn-ln">Regístrate o Inicia sesión</Link>
+                            <Link  to="/auth" className="k-nav-link k-btn">Vender</Link>
+                        </>
+                    )}
+                </div>
+            </nav>
             </div>
-        </nav>
+        </header>
     );
 };
 
@@ -50,6 +59,7 @@ function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
     const [loadingAuth, setLoadingAuth] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     const fetchUnreadStatus = async () => {
         try {
@@ -77,8 +87,6 @@ function App() {
         delete api.defaults.headers.common['Authorization'];
         setIsLoggedIn(false);
         setHasUnreadMessages(false);
-        // --- ¡AQUÍ ESTÁ LA LÍNEA AÑADIDA! ---
-        // Esto redirige al usuario a la página de inicio.
         window.location.href = '/';
     };
 
@@ -88,17 +96,23 @@ function App() {
     };
 
     if (loadingAuth) {
-        return <div>Cargando aplicación...</div>;
+        return <Loader />;
     }
 
     return (
         <Router>
             <div className="App">
                 <Navbar isLoggedIn={isLoggedIn} handleLogout={handleLogout} hasUnreadMessages={hasUnreadMessages} />
-                <main>
+                <div className='k-cat-c'>
+                    <CategoryButtons 
+                        selectedCategory={selectedCategory} 
+                        onCategoryChange={setSelectedCategory} 
+                    />
+                </div>
+                <main className='k-c'>
                     <Routes>
                         {/* --- RUTAS PÚBLICAS --- */}
-                        <Route path="/" element={<HomePage />} />
+                        <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} selectedCategory={selectedCategory} />} />
                         <Route path="/auth" element={<AuthPage handleLogin={handleLogin} />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
 

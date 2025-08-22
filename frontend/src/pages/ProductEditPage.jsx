@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import Loader from '../components/Loader';
 import ProductUploadForm from '../components/ProductUploadForm';
 
 const ProductEditPage = () => {
@@ -30,7 +31,7 @@ const ProductEditPage = () => {
         setTimeout(() => navigate('/profile'), 1500);
     };
 
-    if (loading) return <p>Cargando producto...</p>;
+    if (loading) return <Loader />;;
     if (!product) return <p>Producto no encontrado o no tienes permiso para editarlo.</p>;
 
     return (

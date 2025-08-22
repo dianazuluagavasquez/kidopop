@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import ProductCard from '../components/ProductCard';
-import Modal from '../components/Modal'; // <-- 1. Importa el Modal
+import Modal from '../components/Modal';
+import Loader from '../components/Loader';
 import './ProfilePage.scss';
 
 const ProfilePage = () => {
@@ -64,7 +65,7 @@ const ProfilePage = () => {
         }
     };
 
-    if (loading) return <p>Cargando perfil...</p>;
+    if (loading) return <Loader />;
     if (error) return <p>{error}</p>;
     if (!profile) return null;
 

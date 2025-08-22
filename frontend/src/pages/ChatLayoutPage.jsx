@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import ConversationList from '../components/ConversationList';
 import ChatWindow from '../components/ChatWindow';
 import api from '../services/api';
+import Loader from '../components/Loader';
 
 const ChatLayoutPage = ({ onEnterChat }) => {
     const [selectedConversationId, setSelectedConversationId] = useState(null);

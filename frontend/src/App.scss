@@ -1,49 +1,44 @@
-#root {
-  max-width: 1280px;
+@use '../src/style/variables' as v;
+
+//K-H ---> HEADER
+.k-c {
+  max-width: v.$page-width;
+  padding-left: v.$space-sm;
+  padding-right: v.$space-sm;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.k-h {
+  border-bottom: 1px solid v.$color-border-grey;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.k-h-c {
+  display: flex;
+  justify-content: space-between;
+  height: 60px;
+  align-items: center;
+}
+
+.k-nav {
+  .k-nav-c {
+    display: flex;
+    gap: v.$space-sm;
   }
-  to {
-    transform: rotate(360deg);
-  }
+
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-.nav-link {
+.k-nav-link {
   position: relative;
-  margin-right: 15px;
+  // margin-right: 15px;
+  font-size: v.$font-size-category-l;
+}
+
+.k-cat-c {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid v.$color-border-grey;
+  margin-bottom: v.$space-l;
 }
 
 .notification-dot {
