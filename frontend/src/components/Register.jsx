@@ -9,11 +9,12 @@ const Register = () => {
         username: '',
         email: '',
         password: '',
+        first_name: '', 
     });
 
     const [message, setMessage] = useState(''); // Para mostrar mensajes de éxito o error
 
-    const { username, email, password } = formData;
+    const { username, email, password, first_name} = formData;
 
     // Esta función actualiza el estado cada vez que escribes en un input
     const onChange = (e) => {
@@ -49,6 +50,15 @@ const Register = () => {
         <div>
             <h2>Formulario de Registro</h2>
             <form onSubmit={onSubmit}>
+                 <div>
+                    <input
+                        type="text"
+                        placeholder="Tu nombre"
+                        name="first_name"
+                        value={first_name}
+                        onChange={onChange}
+                    />
+                </div>
                 <div>
                     <input
                         type="text"

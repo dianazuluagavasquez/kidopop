@@ -13,17 +13,17 @@ from .serializers import RegisterSerializer, UserSerializer
 from rest_framework import generics, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny # <-- Importa AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 # CreateAPIView es una vista genérica de DRF que maneja peticiones POST para crear objetos
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny] # <-- Permite que cualquier usuario (incluso no autenticado) pueda registrarse
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
 
 class ProfileView(APIView):
     # Solo los usuarios autenticados pueden ver su perfil
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         # request.user contiene el usuario autenticado gracias al token JWT
