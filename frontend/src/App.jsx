@@ -11,6 +11,7 @@ import ChatLayoutPage from './pages/ChatLayoutPage';
 import ProductUploadPage from './pages/ProductUploadPage';
 import ProfilePage from './pages/ProfilePage';
 import ProductEditPage from './pages/ProductEditPage';
+import ActivationPage from './pages/ActivationPage'; // <-- Importar la nueva página
 import CategoryButtons from './components/CategoryButtons';
 import Loader from './components/Loader';
 
@@ -115,6 +116,7 @@ function App() {
                         <Route path="/" element={<HomePage isLoggedIn={isLoggedIn} selectedCategory={selectedCategory} />} />
                         <Route path="/auth" element={<AuthPage handleLogin={handleLogin} />} />
                         <Route path="/product/:id" element={<ProductDetailPage />} />
+                        <Route path="/activate/:uid/:token" element={<ActivationPage />} /> {/* <-- Añadir esta línea */}
 
                         {/* --- RUTAS PRIVADAS --- */}
                         <Route path="/messages" element={<PrivateRoute><ChatLayoutPage onEnterChat={fetchUnreadStatus} /></PrivateRoute>} />

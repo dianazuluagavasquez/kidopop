@@ -7,13 +7,13 @@ import { useNavigate } from 'react-router-dom';
 
 const Login = ({ onLoginSuccess }) => {
     const [formData, setFormData] = useState({
-        username: '',
+        email: '',
         password: '',
     });
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
-    const { username, password } = formData;
+    const { email, password } = formData;
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,13 +22,14 @@ const Login = ({ onLoginSuccess }) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Hacemos la petición a la ruta '/api/token/' que acabamos de crear
-            const res = await axios.post('http://127.0.0.1:8000/api/token/', formData);
+            // Usamos la instancia de api para que las cabeceras se configuren automáticamente
+            const res = await api.post('/token/', formData);
             const { access, refresh } = res.data;
 
             localStorage.setItem('accessToken', access);
             localStorage.setItem('refreshToken', refresh);
 
+            // El interceptor de api.js ya no es necesario aquí, pero lo dejamos por si acaso
             api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
             if (onLoginSuccess) {
@@ -39,7 +40,11 @@ const Login = ({ onLoginSuccess }) => {
 
         } catch (err) {
             console.error('Error en el login:', err.response ? err.response.data : err);
-            setMessage('Error: Usuario o contraseña incorrectos.');
+            if (err.response && err.response.status === 401 && err.response.data.detail === "No active account found with the given credentials") {
+                setMessage('Tu cuenta no está activa. Por favor, revisa tu correo electrónico para encontrar el enlace de activación.');
+            } else {
+                setMessage('Error: Usuario o contraseña incorrectos.');
+            }
         }
     };
 
@@ -49,10 +54,10 @@ const Login = ({ onLoginSuccess }) => {
             <form onSubmit={onSubmit}>
                 <div>
                     <input
-                        type="text"
-                        placeholder="Nombre de usuario"
-                        name="username"
-                        value={username}
+                        type="email"
+                        placeholder="Correo electrónico"
+                        name="email"
+                        value={email}
                         onChange={onChange}
                         required
                     />

@@ -145,6 +145,11 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),    # Duración del token para refrescar
 }
 
+AUTHENTICATION_BACKENDS = [
+    'users.auth_backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # ==============================================================================
 # CORS - CROSS-ORIGIN RESOURCE SHARING
@@ -183,3 +188,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==============================================================================
+# EMAIL CONFIGURATION
+# ==============================================================================
+# En desarrollo, los correos se imprimirán en la consola donde corres el servidor.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@kidopop.com'
