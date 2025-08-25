@@ -194,4 +194,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==============================================================================
 # En desarrollo, los correos se imprimirán en la consola donde corres el servidor.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@kidopop.com'
+DEFAULT_FROM_EMAIL = 'noreply@kidopop.es'
