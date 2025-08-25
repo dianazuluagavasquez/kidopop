@@ -14,8 +14,10 @@ const ProductList = ({ selectedCategory, isLoggedIn }) => {
     const [error, setError] = useState('');
     
     const [searchTerm, setSearchTerm] = useState('');
-    // const [selectedCategory, setSelectedCategory] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+    const [useLocation, setUseLocation] = useState(false);
+    const [userLocation, setUserLocation] = useState(null);
 
     useEffect(() => {
         const timerId = setTimeout(() => {
@@ -27,6 +29,30 @@ const ProductList = ({ selectedCategory, isLoggedIn }) => {
         };
     }, [searchTerm]);
 
+    useEffect(() => {
+        if (useLocation) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        setUserLocation({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        });
+                    },
+                    (error) => {
+                        console.error("Error getting user location", error);
+                        setUseLocation(false);
+                    }
+                );
+            } else {
+                console.error("Geolocation is not supported by this browser.");
+                setUseLocation(false);
+            }
+        } else {
+            setUserLocation(null);
+        }
+    }, [useLocation]);
+
     const fetchProducts = useCallback(async () => {
         setLoading(true);
         try {
@@ -35,6 +61,10 @@ const ProductList = ({ selectedCategory, isLoggedIn }) => {
                 params.append('search', debouncedSearchTerm);
             }
             if (selectedCategory) params.append('category', selectedCategory);
+            if (userLocation) {
+                params.append('latitude', userLocation.latitude);
+                params.append('longitude', userLocation.longitude);
+            }
 
             const res = await api.get(`/products/?${params.toString()}`);
             setProducts(res.data);
@@ -43,7 +73,7 @@ const ProductList = ({ selectedCategory, isLoggedIn }) => {
         } finally {
             setLoading(false);
         }
-    }, [debouncedSearchTerm, selectedCategory]); 
+    }, [debouncedSearchTerm, selectedCategory, userLocation]); 
 
     useEffect(() => {
         fetchProducts();
@@ -55,6 +85,9 @@ const ProductList = ({ selectedCategory, isLoggedIn }) => {
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
             />
+            <button onClick={() => setUseLocation(!useLocation)}>
+                {useLocation ? 'Dejar de usar mi ubicación' : 'Buscar cerca de mí'}
+            </button>
 
             {!isLoggedIn && (
                 <div className="k-c-btn">
